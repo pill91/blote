@@ -1,0 +1,33 @@
+<!Doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<script type="text/javascript" src="./lib/bignumber.min.js"></script>
+		<script type="text/javascript" src="./lib/web3-light.js"></script>
+		<script type="text/javascript" src="./lib/refreshBalance2.js"></script>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.0/jquery.min.js"></script>
+		<script type="text/javascript" src="./contractabi.js"></script>
+		<script type="text/javascript">
+			let Web3 = require('web3');
+			let web3 = new Web3();
+			let contractAddress = '0x41b15517c466ce8c936fbd5d1d1c90cb874a9528';
+			web3.setProvider(new web3.providers.HttpProvider("http://localhost:8545"));
+			let vc = web3.eth.contract(abi).at(contractAddress);
+			let count = web3.eth.accounts.length;
+
+		</script>
+	</head>
+	<body>
+		<div class="container " role="main">
+			<div id="tablePlace"></div><br />
+			<div id="a"></div>
+			<div>
+				<button id="newAccount" onclick="javascript:newAccount()">NewAccount</button>
+				<button onclick="javascript:selectAccount1()">SEND</button> </h5>	
+			</div>
+		</div>
+		<script>
+			refreshBalance();
+		</script>
+	</body>
+</html>

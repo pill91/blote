@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="./style.css" type="text/css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="./lib/sha256.js"></script>
+    <script type="text/javascript" src="./lib/bignumber.min.js"></script>
+    <script type="text/javascript" src="./lib/web3-light.js"></script>
+    <script type="text/javascript" src="./lib/jquery.min.js"></script>
+    <script type="text/javascript" src="./lib/qrcode.js"></script>
+    <script type="text/javascript" src="./contractabi.js"></script>
+    <script type="text/javascript"></script>
+  </head>
+
+  <body>
+    <h1>회원가입</h1>
+    <div>
+      ID : <br />
+      <input
+        type="text"
+        id="pronumber"
+        placeholder="ID를 입력하시오"
+      /><br /><br />
+      --> PASSWORD : <br />
+      <input
+        type="password"
+        id="proname"
+        placeholder="Password를 입력하시오"
+      /><br /><br />
+      E-Mail : <br />
+      <input
+        type="text"
+        id="proloc"
+        placeholder="Email을 입력하시오"
+      /><br /><br />
+      <button onClick="addProduct()">회원가입</button><br /><br /><br />
+    </div>
+    회원 목록 : <br />
+    <table style="width:100%" id="table1"></table>
+    <br />
+
+    <div id="aa"></div>
+    <div id="qrcode" style="width:100px; height:100px; margin:15px;"></div>
+    <script>
+      var Web3 = require('web3');
+      var web3 = new Web3();
+      web3.setProvider(
+        new web3.providers.HttpProvider('http://192.168.0.152:8545'),
+      );
+      var account = web3.eth.accounts[0];
+      var pass = '123';
+      console.log('starting...');
+
+      if (typeof web3 !== 'undefined') {
+        web3 = new Web3(web3.currentProvider);
+      } else {
+        web3 = new Web3(
+          new Web3.providers.HttpProvider('http://localhost:8545'),
+        );
+      }
+
+      if (web3.isConnected()) {
+        console.log('connected');
+      } else {
+        console.log('not connected');
+        exit;
+      }
+
+      var contractAddress = '0x66205407461af2dd7c54f559afba66d8e303efab';
+      var vc = web3.eth.contract(abi).at(contractAddress);
+
+      // var qrcode = new QRCode(document.getElementById('qrcode'), {
+      //   width: 250,
+      //   height: 250,
+      // });
+      // console.log(qrcode);
+
+      var addEvent = vc.Instructor();
+      addEvent.watch(function(error, result) {
+        if (!error) {
+          var nn = web3.personal.newAccount('123');
+          document.getElementById('aa').innerText = nn;
+          qrcode.makeCode(nn + ',' + '123');
+
+          $(document).ready(function() {
+            let DEBUG = 1;
+
+            function makeCode() {
+              let obj = aa.value;
+              let data = { account: obj.value, passwd: obj.value };
+              let elText = aa.value;
+              if (DEBUG) console.log('obj :', obj.value);
+              if (DEBUG) console.log('elText :', elText);
+
+              if (!obj.value) {
+                alert('Input a text');
+                obj.focus();
+                return;
+              }
+              qrcode.makeCode(elText);
+            }
+
+            $('#qrcodeBtn').on('click', function() {
+              if (DEBUG) console.log('qrcodeBtn');
+              makeCode();
+            });
+          });
+        } else {
+          console.log(error);
+        }
+      });
+
+      function showList() {
+        var table = document.getElementById('table1');
+        var length = vc.getNumOfProducts();
+        for (var i = 0; i < length; i++) {
+          var product = vc.getProductStruct(i);
+          var toString = product.toString();
+          var strArray = toString.split(',');
+          var row = table.insertRow();
+          var cell1 = row.insertCell(0);
+          var cell2 = row.insertCell(1);
+          var cell3 = row.insertCell(2);
+          var cell4 = row.insertCell(3);
+          cell1.innerHTML = strArray[0];
+          cell2.innerHTML = strArray[1];
+          cell3.innerHTML = strArray[2];
+          cell4.style.width = '60%';
+        }
+      }
+      function clearTable() {
+        $('#table1').empty();
+      }
+
+      function addProduct() {
+        var pronumber = document.getElementById('pronumber').value;
+        var proname = document.getElementById('proname').value;
+        var proloc = document.getElementById('proloc').value;
+        if (web3.personal.unlockAccount(account, pass)) {
+          vc.addProStru(
+            pronumber,
+            proname,
+            proloc,
+            { from: account, gas: 2000000 },
+            function(err, result) {
+              if (!err) alert('트랜잭션을 보냄\n');
+            },
+          );
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <script type="text/javascript" src="./lib/bignumber.min.js"></script>
+    <script type="text/javascript" src="./lib/web3-light.js"></script>
+    <script type="text/javascript" src="./lib/refreshBalance.js"></script>
+    <script type="text/javascript" src="./lib/vote.js"></script>
+    <script type="text/javascript" src="./contractabi.js"></script>
+    <script type="text/javascript">
+      let Web3 = require('web3');
+      let web3 = new Web3();
+      web3.setProvider(
+        new web3.providers.HttpProvider('http://localhost:8545'),
+      );
+
+      let contractAddress = '0x41b15517c466ce8c936fbd5d1d1c90cb874a9528';
+      let vc = web3.eth.contract(abi).at(contractAddress);
+
+      function getTransaction() {
+        var transactioninfo = document.getElementById('transactionSearchValue')
+          .value;
+        console.log('transactioninfo : ' + transactioninfo);
+
+        web3.eth.getTransaction(transactioninfo, function(error, traninfo) {
+          if (!error) {
+            document.getElementById('transactionSearch').style.display =
+              'block';
+            document.getElementById('blockSearch').style.display = 'none';
+
+            document.getElementById('txHash').innerText = traninfo.blockHash;
+            document.getElementById('txFrom').innerText = traninfo.from;
+            document.getElementById('txTo').innerText = traninfo.to;
+            document.getElementById('txValue').innerText = web3.fromWei(
+              traninfo.value,
+              'ether',
+            );
+            document.getElementById('txGas').innerText = traninfo.gas;
+            document.getElementById('txGasPrice').innerText = traninfo.gasPrice;
+            document.getElementById('txNonce').innerText = traninfo.nonce;
+
+            web3.eth.getTransactionReceipt(transactioninfo, function(
+              error,
+              receipt,
+            ) {
+              if (!error) {
+                document.getElementById('txGasUsed').innerText = web3.fromWei(
+                  receipt.gasUsed,
+                  'ether',
+                );
+                document.getElementById('txCost').innerText = web3.fromWei(
+                  receipt.cumulativeGasUsed,
+                  'ether',
+                );
+                document.getElementById(
+                  'txCumulativeGasUsed',
+                ).innerText = receipt.cumulativeGasUsed.toString(10);
+              }
+            });
+
+            console.log(traninfo);
+            console.log('blockHash : ' + traninfo.blockHash);
+            console.log('blockNumber : ' + traninfo.blockNumber);
+            console.log('from : ' + traninfo.from);
+            console.log('gas : ' + traninfo.gas);
+            console.log('gasPrice : ' + traninfo.gasPrice);
+            console.log('hash : ' + traninfo.hash);
+
+            console.log('input : ' + traninfo.input);
+            console.log('nonce : ' + traninfo.nonce);
+            console.log('r : ' + traninfo.r);
+            console.log('s : ' + traninfo.s);
+            console.log('v : ' + traninfo.v);
+
+            console.log('to : ' + traninfo.to);
+            console.log('transactionIndex : ' + traninfo.transactionIndex);
+            console.log('value : ' + traninfo.value);
+          } else {
+            //res = error;
+            console.log(error);
+          }
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <div class="row">
+      <!-- <div class="column">
+		  <label>Block # or Hash</label>
+		  <input type="text" id="blockSearchValue" placeholder="1" />
+		</div>
+		<div class="column">
+		  <br />
+		  <button id="searchBlock" onClick="getBlock();">Search Block</button>
+		  <button type="button" onClick="getTransaction();">Get Transaction Info</button>
+		</div> -->
+      <div class="column">
+        <label>Transaction Hash</label>
+        <input
+          type="text"
+          id="transactionSearchValue"
+          placeholder="0x365b070c8cbac9..."
+        />
+      </div>
+      <div class="column">
+        <br />
+        <button id="searchTransaction" onClick="getTransaction();">
+          Search Transaction
+        </button>
+      </div>
+    </div>
+  </body>
+</html>
